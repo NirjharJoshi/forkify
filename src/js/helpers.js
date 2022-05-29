@@ -1,5 +1,5 @@
 import { async } from 'regenerator-runtime';
-import { TIMEOUT_SEC } from './config';
+import { TIMEOUT_SEC } from './config.js';
 
 const timeout = function (s) {
   return new Promise(function (_, reject) {
@@ -20,9 +20,11 @@ export const AJAX = async function (url, uploadData = undefined) {
           body: JSON.stringify(uploadData),
         })
       : fetch(url);
-    const response = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
-    const data = await response.json();
-    if (!response.ok) throw new Error(`${data.message} (${response.status})`);
+
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
     return data;
   } catch (err) {
     throw err;
@@ -30,6 +32,19 @@ export const AJAX = async function (url, uploadData = undefined) {
 };
 
 /*
+export const getJSON = async function (url) {
+  try {
+    const fetchPro = fetch(url);
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};
+
 export const sendJSON = async function (url, uploadData) {
   try {
     const fetchPro = fetch(url, {
@@ -39,20 +54,11 @@ export const sendJSON = async function (url, uploadData) {
       },
       body: JSON.stringify(uploadData),
     });
-    const response = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
-    const data = await response.json();
-    if (!response.ok) throw new Error(`${data.message} (${response.status})`);
-    return data;
-  } catch (err) {
-    throw err;
-  }
-};
 
-export const getJSON = async function (url) {
-  try {
-    const response = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]);
-    const data = await response.json();
-    if (!response.ok) throw new Error(`${data.message} (${response.status})`);
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
     return data;
   } catch (err) {
     throw err;
